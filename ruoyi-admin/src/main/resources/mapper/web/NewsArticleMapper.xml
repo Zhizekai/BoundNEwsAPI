@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.web.mapper.NewsArticleMapper">
+    
+    <resultMap type="NewsArticle" id="NewsArticleResult">
+        <result property="newsArticleId"    column="news_article_id"    />
+        <result property="commentCount"    column="comment_count"    />
+        <result property="content"    column="content"    />
+        <result property="excerpt"    column="excerpt"    />
+        <result property="favoriteCount"    column="favorite_count"    />
+        <result property="next"    column="next"    />
+        <result property="pre"    column="pre"    />
+        <result property="preNext"    column="pre_next"    />
+        <result property="switchComment"    column="switch_comment"    />
+        <result property="thumbnail"    column="thumbnail"    />
+        <result property="title"    column="title"    />
+        <result property="views"    column="views"    />
+        <result property="likes" column="likes" />
+        <result property="createTime"    column="create_time"    />
+        <result property="modifiedTime"    column="modified_time"    />
+
+        <collection property="newsTagList" resultMap="com.ruoyi.web.mapper.NewsTagMapper.NewsTagResult" />
+        <collection property="likeList"  resultMap="com.ruoyi.web.mapper.NewsWxUserMapper.NewsWxUserResult"/>
+    </resultMap>
+
+    <resultMap type="NewsArticle" id="LeastNewsArticleResult">
+        <result property="newsArticleId"    column="news_article_id"    />
+        <result property="commentCount"    column="comment_count"    />
+        <result property="content"    column="content"    />
+        <result property="excerpt"    column="excerpt"    />
+        <result property="favoriteCount"    column="favorite_count"    />
+        <result property="next"    column="next"    />
+        <result property="pre"    column="pre"    />
+        <result property="preNext"    column="pre_next"    />
+        <result property="switchComment"    column="switch_comment"    />
+        <result property="thumbnail"    column="thumbnail"    />
+        <result property="title"    column="title"    />
+        <result property="views"    column="views"    />
+        <result property="likes" column="likes" />
+        <result property="createTime"    column="create_time"    />
+        <result property="modifiedTime"    column="modified_time"    />
+
+        <collection property="newsTagList" select="selectTagList" column="news_article_id"/>
+    </resultMap>
+
+    <sql id="selectNewsArticleVo">
+        select news_article_id, comment_count, content, excerpt, favorite_count, next, pre, pre_next, switch_comment, thumbnail, title, views, create_time, modified_time from news_article
+    </sql>
+
+    <!--获取微信最新文章列表-->
+    <select id="selectWXNewsArticleList" parameterType="NewsArticle" resultMap="LeastNewsArticleResult">
+        SELECT news_article_id,
+        comment_count,
+        excerpt,
+        favorite_count,
+        thumbnail,
+        title,
+        views,
+        likes,
+        news_article.create_time
+        FROM
+        news_article
+        <where>
+            <if test="commentCount != null ">and comment_count = #{commentCount}</if>
+            <if test="preNext != null ">and pre_next = #{preNext}</if>
+            <if test="switchComment != null ">and switch_comment = #{switchComment}</if>
+            <if test="title != null  and title != ''">and title like concat('%', #{title}, '%')</if>
+            <if test="views != null ">and views = #{views}</if>
+            <if test="params.beginModifiedTime != null and params.beginModifiedTime != '' and params.endModifiedTime != null and params.endModifiedTime != ''">
+                and modified_time between #{params.beginModifiedTime} and #{params.endModifiedTime}
+            </if>
+        </where>
+    </select>
+
+    <!-- 获取文章tag列表子查询-->
+    <select id="selectTagList" parameterType="Long" resultMap="com.ruoyi.web.mapper.NewsTagMapper.NewsTagResult">
+        select  news_tag_id,
+                tag_name
+        from news_tag inner join news_article_and_tag on news_article_and_tag.tag_id = news_tag.news_tag_id
+        where news_article_and_tag.article_id = #{news_article_id}
+    </select>
+
+    <!-- 获取文章的评论数-->
+    <select id="selectArticleCommentCount" parameterType="Long" resultType="integer">
+        SELECT
+            COUNT(*)
+        FROM
+            news_article
+                INNER JOIN news_article_and_comment ON news_article_and_comment.article_id = news_article.news_article_id
+        WHERE
+            news_article.news_article_id = #{newsArticleId}
+    </select>
+
+    <!-- 获取文章的收藏数-->
+    <select id="selectArticleCollectionCount" parameterType="Long" resultType="integer">
+        SELECT
+            COUNT(*)
+        FROM
+            news_article
+                INNER JOIN news_article_and_user_collection ON news_article_and_user_collection.article_id = news_article.news_article_id
+        WHERE
+            news_article.news_article_id = #{newsArticleId}
+    </select>
+
+    <!-- 随机获取指定数量的文章-->
+    <select id="selectRandomArticleList" parameterType="integer" resultMap="LeastNewsArticleResult" flushCache="true">
+        SELECT news_article_id,
+               comment_count,
+               excerpt,
+               favorite_count,
+               thumbnail,
+               title,
+               views,
+               likes,
+               news_article.create_time
+        FROM news_article
+        ORDER BY RAND() LIMIT #{article_num}
+
+    </select>
+
+    <!--获取同一个tag的文章-->
+    <select id="selectNewsArticleListByTagId" parameterType="Long" resultMap="NewsArticleResult">
+        SELECT
+            news_article_id,
+            comment_count,
+            excerpt,
+            favorite_count,
+            thumbnail,
+            title,
+            views,
+            likes,
+            news_article.create_time
+        FROM
+            news_article
+                INNER JOIN news_article_and_tag ON news_article.news_article_id = news_article_and_tag.article_id
+        WHERE tag_id = #{newsTagId}
+
+    </select>
+
+    <!--获取某一个类型的文章-->
+    <select id="selectNewsArticleListByCategoryId" parameterType="Long" resultMap="NewsArticleResult">
+        SELECT
+            news_article_id,
+            comment_count,
+            excerpt,
+            favorite_count,
+            thumbnail,
+            title,
+            views,
+            likes,
+            news_article.create_time
+        FROM
+            news_article
+                INNER JOIN news_article_and_category ON news_article.news_article_id = news_article_and_category.article_id
+        WHERE news_article_and_category.category_id = #{categoryId}
+
+    </select>
+
+
+
+    <!-- 获取用户收藏列表-->
+    <select id="selectNewsArticleCollectionListByToken" parameterType="String" resultMap="NewsArticleResult">
+
+        SELECT
+            news_article_id,
+            comment_count,
+            excerpt,
+            favorite_count,
+            thumbnail,
+            title,
+            views,
+            likes,
+            news_article.create_time,
+            token
+        FROM
+            news_article
+                INNER JOIN news_article_and_user_collection ON news_article_and_user_collection.article_id = news_article.news_article_id
+                INNER JOIN news_wx_user ON news_wx_user_id = news_article_and_user_collection.wx_user_id
+        WHERE token = #{token}
+    </select>
+
+
+    <!-- 获取用户点赞过得文章列表-->
+    <select id="selectNewsArticleLikesListByToken" parameterType="String" resultMap="NewsArticleResult">
+        SELECT
+            news_article_id,
+            comment_count,
+            excerpt,
+            favorite_count,
+            thumbnail,
+            title,
+            views,
+            likes,
+            news_article.create_time,
+            token
+        FROM
+            news_article
+                INNER JOIN news_article_and_user_like ON news_article_and_user_like.article_id = news_article.news_article_id
+                INNER JOIN news_wx_user ON news_wx_user_id = news_article_and_user_like.user_id
+        WHERE token = #{token}
+    </select>
+
+
+    <!-- 获取文章的点赞头像url列表-->
+    <select id="selectNewsArticleList" parameterType="NewsArticle" resultMap="NewsArticleResult">
+        <include refid="selectNewsArticleVo"/>
+        <where>  
+            <if test="commentCount != null "> and comment_count = #{commentCount}</if>
+            <if test="preNext != null "> and pre_next = #{preNext}</if>
+            <if test="switchComment != null "> and switch_comment = #{switchComment}</if>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="views != null "> and views = #{views}</if>
+            <if test="params.beginModifiedTime != null and params.beginModifiedTime != '' and params.endModifiedTime != null and params.endModifiedTime != ''"> and modified_time between #{params.beginModifiedTime} and #{params.endModifiedTime}</if>
+        </where>
+    </select>
+
+    <!-- 获取小程序端文章详情-->
+    <select id="selectNewsArticleByNewsArticleId" parameterType="Long" resultMap="NewsArticleResult">
+
+        SELECT
+            news_article_id,
+            comment_count,
+            content,
+            excerpt,
+            favorite_count,
+            next,
+            pre,
+            pre_next,
+            switch_comment,
+            thumbnail,
+            title,
+            views,
+            news_article.create_time,
+            news_tag_id,
+            tag_name,
+            avatar
+        FROM
+            news_article
+            LEFT JOIN news_article_and_tag ON news_article.news_article_id = news_article_and_tag.article_id
+            LEFT JOIN news_tag on news_article_and_tag.tag_id = news_tag.news_tag_id
+            LEFT JOIN news_article_and_user_like ON news_article_and_user_like.article_id = news_article.news_article_id
+            LEFT JOIN news_wx_user ON news_wx_user_id = news_article_and_user_like.user_id
+        where news_article_id = #{newsArticleId}
+    </select>
+        
+    <insert id="insertNewsArticle" parameterType="NewsArticle" useGeneratedKeys="true" keyProperty="newsArticleId">
+        insert into news_article
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="commentCount != null">comment_count,</if>
+            <if test="content != null">content,</if>
+            <if test="excerpt != null and excerpt != ''">excerpt,</if>
+            <if test="favoriteCount != null">favorite_count,</if>
+            <if test="next != null">next,</if>
+            <if test="pre != null">pre,</if>
+            <if test="preNext != null">pre_next,</if>
+            <if test="switchComment != null">switch_comment,</if>
+            <if test="thumbnail != null and thumbnail != ''">thumbnail,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="views != null">views,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="modifiedTime != null">modified_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="commentCount != null">#{commentCount},</if>
+            <if test="content != null">#{content},</if>
+            <if test="excerpt != null and excerpt != ''">#{excerpt},</if>
+            <if test="favoriteCount != null">#{favoriteCount},</if>
+            <if test="next != null">#{next},</if>
+            <if test="pre != null">#{pre},</if>
+            <if test="preNext != null">#{preNext},</if>
+            <if test="switchComment != null">#{switchComment},</if>
+            <if test="thumbnail != null and thumbnail != ''">#{thumbnail},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="views != null">#{views},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="modifiedTime != null">#{modifiedTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateNewsArticle" parameterType="NewsArticle">
+        update news_article
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="commentCount != null">comment_count = #{commentCount},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="excerpt != null and excerpt != ''">excerpt = #{excerpt},</if>
+            <if test="favoriteCount != null">favorite_count = #{favoriteCount},</if>
+            <if test="next != null">next = #{next},</if>
+            <if test="pre != null">pre = #{pre},</if>
+            <if test="preNext != null">pre_next = #{preNext},</if>
+            <if test="switchComment != null">switch_comment = #{switchComment},</if>
+            <if test="thumbnail != null and thumbnail != ''">thumbnail = #{thumbnail},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="views != null">views = #{views},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="modifiedTime != null">modified_time = #{modifiedTime},</if>
+        </trim>
+        where news_article_id = #{newsArticleId}
+    </update>
+
+    <delete id="deleteNewsArticleByNewsArticleId" parameterType="Long">
+        delete from news_article where news_article_id = #{newsArticleId}
+    </delete>
+
+    <delete id="deleteNewsArticleByNewsArticleIds" parameterType="String">
+        delete from news_article where news_article_id in 
+        <foreach item="newsArticleId" collection="array" open="(" separator="," close=")">
+            #{newsArticleId}
+        </foreach>
+    </delete>
+</mapper>

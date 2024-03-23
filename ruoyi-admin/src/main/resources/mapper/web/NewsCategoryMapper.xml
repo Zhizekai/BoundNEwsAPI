@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.web.mapper.NewsCategoryMapper">
+    
+    <resultMap type="NewsCategory" id="NewsCategoryResult">
+        <result property="newsCategoryId"    column="news_category_id"    />
+        <result property="name"    column="name"    />
+        <result property="description"    column="description"    />
+        <result property="cover"    column="cover"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="modifiedTime"    column="modified_time"    />
+    </resultMap>
+
+    <sql id="selectNewsCategoryVo">
+        select news_category_id, name, description, cover, create_time, modified_time from news_category
+    </sql>
+
+    <select id="selectNewsCategoryList" parameterType="NewsCategory" resultMap="NewsCategoryResult">
+        <include refid="selectNewsCategoryVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and create_time between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+            <if test="params.beginModifiedTime != null and params.beginModifiedTime != '' and params.endModifiedTime != null and params.endModifiedTime != ''"> and modified_time between #{params.beginModifiedTime} and #{params.endModifiedTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectNewsCategoryByNewsCategoryId" parameterType="Long" resultMap="NewsCategoryResult">
+        <include refid="selectNewsCategoryVo"/>
+        where news_category_id = #{newsCategoryId}
+    </select>
+        
+    <insert id="insertNewsCategory" parameterType="NewsCategory" useGeneratedKeys="true" keyProperty="newsCategoryId">
+        insert into news_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="description != null">description,</if>
+            <if test="cover != null">cover,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="modifiedTime != null">modified_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="description != null">#{description},</if>
+            <if test="cover != null">#{cover},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="modifiedTime != null">#{modifiedTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateNewsCategory" parameterType="NewsCategory">
+        update news_category
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="cover != null">cover = #{cover},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="modifiedTime != null">modified_time = #{modifiedTime},</if>
+        </trim>
+        where news_category_id = #{newsCategoryId}
+    </update>
+
+    <delete id="deleteNewsCategoryByNewsCategoryId" parameterType="Long">
+        delete from news_category where news_category_id = #{newsCategoryId}
+    </delete>
+
+    <delete id="deleteNewsCategoryByNewsCategoryIds" parameterType="String">
+        delete from news_category where news_category_id in 
+        <foreach item="newsCategoryId" collection="array" open="(" separator="," close=")">
+            #{newsCategoryId}
+        </foreach>
+    </delete>
+</mapper>

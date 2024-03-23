@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.web.mapper.NewsWxUserMapper">
+    
+    <resultMap type="NewsWxUser" id="NewsWxUserResult">
+        <result property="newsWxUserId"    column="news_wx_user_id"    />
+        <result property="nickname"    column="nickname"    />
+        <result property="openid"    column="openid"    />
+        <result property="token"    column="token"    />
+        <result property="phoneNumber"    column="phone_number"    />
+        <result property="avatar"    column="avatar"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="modifiedTime"    column="modified_time"    />
+    </resultMap>
+
+    <sql id="selectNewsWxUserVo">
+        select news_wx_user_id, nickname, openid, token, phone_number, avatar, create_time, modified_time from news_wx_user
+    </sql>
+
+    <select id="selectNewsWxUserList" parameterType="NewsWxUser" resultMap="NewsWxUserResult">
+        <include refid="selectNewsWxUserVo"/>
+        <where>
+            <if test="nickname != null  and nickname != ''"> and nickname like concat('%', #{nickname}, '%')</if>
+            <if test="openid != null  and openid != ''"> and openid = #{openid}</if>
+            <if test="phoneNumber != null  and phoneNumber != ''"> and phone_number = #{phoneNumber}</if>
+            <if test="token != null  and token != ''"> and token = #{token}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and create_time between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+            <if test="params.beginModifiedTime != null and params.beginModifiedTime != '' and params.endModifiedTime != null and params.endModifiedTime != ''"> and modified_time between #{params.beginModifiedTime} and #{params.endModifiedTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectNewsWxUserByNewsWxUserId" parameterType="Long" resultMap="NewsWxUserResult">
+        <include refid="selectNewsWxUserVo"/>
+        where news_wx_user_id = #{newsWxUserId}
+    </select>
+        
+    <insert id="insertNewsWxUser" parameterType="NewsWxUser" useGeneratedKeys="true" keyProperty="newsWxUserId">
+        insert into news_wx_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="nickname != null">nickname,</if>
+            <if test="openid != null">openid,</if>
+            <if test="phoneNumber != null">phone_number,</if>
+            <if test="avatar != null">avatar,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="modifiedTime != null">modified_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="nickname != null">#{nickname},</if>
+            <if test="openid != null">#{openid},</if>
+            <if test="phoneNumber != null">#{phoneNumber},</if>
+            <if test="avatar != null">#{avatar},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="modifiedTime != null">#{modifiedTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateNewsWxUser" parameterType="NewsWxUser">
+        update news_wx_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="nickname != null">nickname = #{nickname},</if>
+            <if test="openid != null">openid = #{openid},</if>
+            <if test="phoneNumber != null">phone_number = #{phoneNumber},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="token != null">token = #{token},</if>
+            <if test="modifiedTime != null">modified_time = #{modifiedTime},</if>
+        </trim>
+        where news_wx_user_id = #{newsWxUserId}
+    </update>
+
+    <delete id="deleteNewsWxUserByNewsWxUserId" parameterType="Long">
+        delete from news_wx_user where news_wx_user_id = #{newsWxUserId}
+    </delete>
+
+    <delete id="deleteNewsWxUserByNewsWxUserIds" parameterType="String">
+        delete from news_wx_user where news_wx_user_id in 
+        <foreach item="newsWxUserId" collection="array" open="(" separator="," close=")">
+            #{newsWxUserId}
+        </foreach>
+    </delete>
+</mapper>

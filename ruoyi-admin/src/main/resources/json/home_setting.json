@@ -1,0 +1,100 @@
+{
+    "code": 0,
+    "msg": "操作成功！",
+    "data": {
+        "logo": "https://xcx.jiangqie.com/wp-content/uploads/2021/10/zgkyb.png",
+        "title": "工大de资讯小程序（开源版）",
+        "description": "工大de资讯小程序（开源版）",
+        "keywords": "工大de资讯,小程序",
+        "top_nav": [
+            {
+                "id": 23,
+                "name": "工大de资讯小程序"
+            },
+            {
+                "id": 8,
+                "name": "工大de资讯快讯"
+            },
+            {
+                "id": 52,
+                "name": "工大de资讯WordPress主题"
+            },
+            {
+                "id": 1,
+                "name": "工大de资讯小程序（uni专业版）"
+            }
+        ],
+        "slide": [
+            {
+                "id": 814,
+                "thumbnail": "https://imagecloud.thepaper.cn/thepaper/image/105/83/678.png",
+                "title": "工大de资讯小程序（uni专业版）"
+            }
+        ],
+        "icon_nav": [
+            {
+                "title": "积分/资讯版",
+                "icon": "https://xcx.jiangqie.com/wp-content/uploads/2021/07/Q1.png",
+                "link": "wxddead77a1155c39f",
+                "switch": "1"
+            },
+            {
+                "title": "工大de资讯圈子",
+                "icon": "https://xcx.jiangqie.com/wp-content/uploads/2021/07/Q4.png",
+                "link": "wxe501b4f59afa1e19",
+                "switch": "1"
+            },
+            {
+                "title": "官网小程序",
+                "icon": "https://xcx.jiangqie.com/wp-content/uploads/2021/07/Q3.png",
+                "link": "wx589dff586a7c9b4f",
+                "switch": "1"
+            },
+            {
+                "title": "知识付费",
+                "icon": "https://xcx.jiangqie.com/wp-content/uploads/2021/07/Q3.png",
+                "link": "wx330d4c92336035d2",
+                "switch": "1"
+            }
+        ],
+        "actives": {
+            "left": {
+                "image": "https://xcx.jiangqie.com/wp-content/uploads/2023/11/88-1.png",
+                "title": "",
+                "link": "https://www.zhuige.com/product.html?free=0"
+            },
+            "right_top": {
+                "image": "https://xcx.jiangqie.com/wp-content/uploads/2022/10/h1-post-2-img-2.jpg",
+                "title": "工大de资讯小程序“功能清单”",
+                "link": "/pages/article/article?post_id=273"
+            },
+            "right_down": {
+                "image": "https://xcx.jiangqie.com/wp-content/uploads/2022/10/loren-gu-146832-unsplash-550x367-1.jpg",
+                "title": "微信客服、加群交流...",
+                "link": "/pages/article/article?post_id=728"
+            }
+        },
+        "hot": [
+            {
+                "id": 2262,
+                "title": "【多端】工大de资讯小程序V1.5.0发布下载",
+                "thumbnail": "https://xcx.jiangqie.com/wp-content/uploads/2021/05/jqfree.png"
+            },
+            {
+                "id": 959,
+                "title": "工大de资讯小程序“社区”PRO版来了...",
+                "thumbnail": "https://xcx.jiangqie.com/wp-content/uploads/2020/04/jqad.jpg"
+            },
+            {
+                "id": 1999,
+                "title": "工大de资讯（WordPress资讯/社区主题）正式发布",
+                "thumbnail": "https://xcx.jiangqie.com/wp-content/uploads/2021/04/screenshot.png"
+            }
+        ],
+        "list_mode": "3",
+        "background": "https://xcx.jiangqie.com/wp-content/plugins/jiangqie-free-mini-program/public/images/id_bg.png",
+        "wx_ad": false,
+        "share_title": "工大de资讯小程序（开源版）",
+        "share_thumb": "https://xcx.jiangqie.com/wp-content/uploads/2023/11/88880099.png"
+    }
+}

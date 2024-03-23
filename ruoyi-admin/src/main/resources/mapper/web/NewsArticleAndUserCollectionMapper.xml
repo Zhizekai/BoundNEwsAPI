@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.web.mapper.NewsArticleAndUserCollectionMapper">
+    
+    <resultMap type="NewsArticleAndUserCollection" id="NewsArticleAndUserCollectionResult">
+        <result property="id"    column="id"    />
+        <result property="articleId"    column="article_id"    />
+        <result property="wxUserId"    column="wx_user_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="modifiedTime"    column="modified_time"    />
+    </resultMap>
+
+    <sql id="selectNewsArticleAndUserCollectionVo">
+        select id, article_id, wx_user_id, create_time, modified_time from news_article_and_user_collection
+    </sql>
+
+    <!-- 查询用户是否已经收藏该文章-->
+    <select id="selectNewsArticleAndUserCollectionList" parameterType="NewsArticleAndUserCollection" resultMap="NewsArticleAndUserCollectionResult">
+        <include refid="selectNewsArticleAndUserCollectionVo"/>
+        <where>  
+            <if test="articleId != null "> and article_id = #{articleId}</if>
+            <if test="wxUserId != null "> and wx_user_id = #{wxUserId}</if>
+            <if test="modifiedTime != null "> and modified_time = #{modifiedTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectNewsArticleAndUserCollectionById" parameterType="Long" resultMap="NewsArticleAndUserCollectionResult">
+        <include refid="selectNewsArticleAndUserCollectionVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertNewsArticleAndUserCollection" parameterType="NewsArticleAndUserCollection" useGeneratedKeys="true" keyProperty="id">
+        insert into news_article_and_user_collection
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="articleId != null">article_id,</if>
+            <if test="wxUserId != null">wx_user_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="modifiedTime != null">modified_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="articleId != null">#{articleId},</if>
+            <if test="wxUserId != null">#{wxUserId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="modifiedTime != null">#{modifiedTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateNewsArticleAndUserCollection" parameterType="NewsArticleAndUserCollection">
+        update news_article_and_user_collection
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="articleId != null">article_id = #{articleId},</if>
+            <if test="wxUserId != null">wx_user_id = #{wxUserId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="modifiedTime != null">modified_time = #{modifiedTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteNewsArticleAndUserCollectionById" parameterType="Long">
+        delete from news_article_and_user_collection where id = #{id}
+    </delete>
+
+    <delete id="deleteNewsArticleAndUserCollectionByIds" parameterType="String">
+        delete from news_article_and_user_collection where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

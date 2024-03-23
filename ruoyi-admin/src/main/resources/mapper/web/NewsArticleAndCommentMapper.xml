@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.web.mapper.NewsArticleAndCommentMapper">
+    
+    <resultMap type="NewsArticleAndComment" id="NewsArticleAndCommentResult">
+        <result property="articleAndCommentId"    column="article_and_comment_id"    />
+        <result property="articleId"    column="article_id"    />
+        <result property="commentId"    column="comment_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="modifiedTime"    column="modified_time"    />
+    </resultMap>
+
+    <sql id="selectNewsArticleAndCommentVo">
+        select article_and_comment_id, article_id, comment_id, create_time, modified_time from news_article_and_comment
+    </sql>
+
+    <select id="selectNewsArticleAndCommentList" parameterType="NewsArticleAndComment" resultMap="NewsArticleAndCommentResult">
+        <include refid="selectNewsArticleAndCommentVo"/>
+        <where>  
+            <if test="articleId != null "> and article_id = #{articleId}</if>
+            <if test="commentId != null "> and comment_id = #{commentId}</if>
+            <if test="modifiedTime != null "> and modified_time = #{modifiedTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectNewsArticleAndCommentByArticleAndCommentId" parameterType="Long" resultMap="NewsArticleAndCommentResult">
+        <include refid="selectNewsArticleAndCommentVo"/>
+        where article_and_comment_id = #{articleAndCommentId}
+    </select>
+        
+    <insert id="insertNewsArticleAndComment" parameterType="NewsArticleAndComment" useGeneratedKeys="true" keyProperty="articleAndCommentId">
+        insert into news_article_and_comment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="articleId != null">article_id,</if>
+            <if test="commentId != null">comment_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="modifiedTime != null">modified_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="articleId != null">#{articleId},</if>
+            <if test="commentId != null">#{commentId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="modifiedTime != null">#{modifiedTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateNewsArticleAndComment" parameterType="NewsArticleAndComment">
+        update news_article_and_comment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="articleId != null">article_id = #{articleId},</if>
+            <if test="commentId != null">comment_id = #{commentId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="modifiedTime != null">modified_time = #{modifiedTime},</if>
+        </trim>
+        where article_and_comment_id = #{articleAndCommentId}
+    </update>
+
+    <delete id="deleteNewsArticleAndCommentByArticleAndCommentId" parameterType="Long">
+        delete from news_article_and_comment where article_and_comment_id = #{articleAndCommentId}
+    </delete>
+
+    <delete id="deleteNewsArticleAndCommentByArticleAndCommentIds" parameterType="String">
+        delete from news_article_and_comment where article_and_comment_id in 
+        <foreach item="articleAndCommentId" collection="array" open="(" separator="," close=")">
+            #{articleAndCommentId}
+        </foreach>
+    </delete>
+</mapper>

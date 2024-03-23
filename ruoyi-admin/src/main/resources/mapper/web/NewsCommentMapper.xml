@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.web.mapper.NewsCommentMapper">
+    
+    <resultMap type="NewsComment" id="NewsCommentResult">
+        <result property="newsCommentId"    column="news_comment_id"    />
+        <result property="content"    column="content"    />
+        <result property="approved"    column="approved"    />
+        <result property="userId"    column="user_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="modifiedTime"    column="modified_time"    />
+
+        <collection property="newsWxUser"  resultMap="com.ruoyi.web.mapper.NewsWxUserMapper.NewsWxUserResult"/>
+    </resultMap>
+
+    <sql id="selectNewsCommentVo">
+        select news_comment_id, content, approved, user_id, create_time, modified_time from news_comment
+    </sql>
+
+
+    <!--获取某一个文章底下的评论列表-->
+
+    <select id="selectCommentListByArticleId" parameterType="Long" resultMap="NewsCommentResult">
+        SELECT
+            news_comment_id,
+            content,
+            approved,
+            user_id,
+            news_comment.create_time,
+            news_wx_user.avatar
+        FROM
+            news_comment
+            INNER JOIN news_article_and_comment ON news_article_and_comment.comment_id = news_comment.news_comment_id
+            INNER JOIN news_wx_user ON news_comment.user_id = news_wx_user.news_wx_user_id
+        WHERE news_article_and_comment.article_id = #{newsArticleId}
+    </select>
+
+
+    <!--管理端获取全部评论列表-->
+    <select id="selectNewsCommentList" parameterType="NewsComment" resultMap="NewsCommentResult">
+        <include refid="selectNewsCommentVo"/>
+        <where>  
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="approved != null "> and approved = #{approved}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and create_time between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+            <if test="params.beginModifiedTime != null and params.beginModifiedTime != '' and params.endModifiedTime != null and params.endModifiedTime != ''"> and modified_time between #{params.beginModifiedTime} and #{params.endModifiedTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectNewsCommentByNewsCommentId" parameterType="Long" resultMap="NewsCommentResult">
+        <include refid="selectNewsCommentVo"/>
+        where news_comment_id = #{newsCommentId}
+    </select>
+
+    <insert id="insertWXNewsComment" parameterType="NewsComment" useGeneratedKeys="true" keyProperty="newsCommentId">
+        insert into news_comment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="content != null and content != ''">content,</if>
+            <if test="approved != null">approved,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="modifiedTime != null">modified_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="approved != null">#{approved},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="modifiedTime != null">#{modifiedTime},</if>
+        </trim>
+    </insert>
+        
+    <insert id="insertNewsComment" parameterType="NewsComment" useGeneratedKeys="true" keyProperty="newsCommentId">
+        insert into news_comment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="content != null and content != ''">content,</if>
+            <if test="approved != null">approved,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="modifiedTime != null">modified_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="approved != null">#{approved},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="modifiedTime != null">#{modifiedTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateNewsComment" parameterType="NewsComment">
+        update news_comment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="approved != null">approved = #{approved},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="modifiedTime != null">modified_time = #{modifiedTime},</if>
+        </trim>
+        where news_comment_id = #{newsCommentId}
+    </update>
+
+    <delete id="deleteNewsCommentByNewsCommentId" parameterType="Long">
+        delete from news_comment where news_comment_id = #{newsCommentId}
+    </delete>
+
+    <delete id="deleteNewsCommentByNewsCommentIds" parameterType="String">
+        delete from news_comment where news_comment_id in 
+        <foreach item="newsCommentId" collection="array" open="(" separator="," close=")">
+            #{newsCommentId}
+        </foreach>
+    </delete>
+</mapper>
